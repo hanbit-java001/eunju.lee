@@ -1,24 +1,27 @@
 package com.hanbit.eunju.lee.standalone;
 
 public class Person {
-	public static final String HOSPITAL = "병원";
-	public static final String HOME = "집";
-	public static final String SCHOOL = "학교";
 
 	private int age;
 	private String name;
-	private String location;
+	private Location location;
+
+	private Female female;
+
+	private class Female {
+
+	}
 
 	public Person() {
 		age = 1;
-		location = "병원";
+		location = Location.LOC_HOSPITAL;
 	}
 
 	public void liveYear() {
-		age++;
+		this.age++;
 	}
 
-	public int getAge(){
+	public int getAge() {
 		return age;
 	}
 
@@ -30,23 +33,26 @@ public class Person {
 		return name;
 	}
 
-	public String getLocation() {
+	public Location getLocation() {
 		return location;
 	}
 
-	private void go(String location) {
+	private void go(Location location) {
 		this.location = location;
 	}
 
 	public void goHome() {
-		go(HOME);
+		go(Location.LOC_HOME);
 	}
 
 	public void goSchool() {
-		go(SCHOOL);
+		go(Location.LOC_SCHOOL);
 	}
 
-	public void goHospital() {
-		go(HOSPITAL);
+	public String toString() {
+		String personString = "?굹?씠: " + getAge() + " ?쐞移?: " + getLocation();
+
+		return personString;
 	}
+
 }

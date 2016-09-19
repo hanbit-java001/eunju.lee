@@ -1,114 +1,65 @@
 package com.hanbit.eunju.lee.core.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.hanbit.eunju.lee.core.vo.ScheduleVO;
 
+@Repository
 public class ScheduleDAO {
-	private Connection getConnection() {
-		String url = "jdbc:oracle:thin:@127.0.0.1/xe";
-		String user = "hanbit";
-		String password = "hanbit";
 
-		Connection connection = null;
-		try {
-			Class.forName("oracle.jdbc.OracleDriver");
-			connection = DriverManager.getConnection(url,user,password);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-		return connection;
-	}
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleDAO.class);
 
-	private void closeConnection(Connection connection) {
-		try {
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private int executeSql(Connection connection, String sql, List params) {
-		int result = 0;
-
-		try {
-			PreparedStatement statement = connection.prepareStatement(sql);
-
-			for (int i=0;i<params.size();i++) {
-				statement.setObject(i + 1, params.get(i));
-			}
-
-			result = statement.executeUpdate();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return result;
-	}
+	@Autowired
+	private SqlSession sqlSession;
 
 	public int insertSchedule(ScheduleVO schedule) {
+		LOGGER.debug("인서트 스케줄");
 
-/*		String sql = "INSERT INTO SCHEDULE (SCHEDULE_ID, TITLE, MEMO, START_DT, END_DT) "
-				+ " VALUES('" + schedule.getScheduleId() + "', "
-				+ "'" + schedule.getTitle() + "', "
-				+ "'" + schedule.getMemo() + "', "
-				+ "'" + schedule.getStartDt() + "', "
-				+ "'" + schedule.getEndDt() + "')";	*/
-
-		Connection connection = getConnection();
-		String sql = "INSERT INTO SCHEDULE (SCHEDULE_ID, TITLE, MEMO, START_DT, END_DT) VALUES(?,?,?,?,?)";
-
-		List params = new ArrayList();
-		params.add(schedule.getScheduleId());
-		params.add(schedule.getTitle());
-		params.add(schedule.getMemo());
-		params.add(schedule.getStartDt());
-		params.add(schedule.getEndDt());
-
-		int result = executeSql(connection, sql, params);
-
-		closeConnection(connection);
+		int result = sqlSession.insert("schedule.insertSchedule", schedule);
 
 		return result;
 	}
 
 	public int updateSchedule(ScheduleVO schedule) {
-		Connection connection = getConnection();
-
-		String sql = "UPDATE SCHEDULE SET TITLE=?, MEMO=?, START_DT=?, END_DT=? WHERE SCHEDULE_ID=?";
-
-		List params = new ArrayList();
-		params.add(schedule.getTitle());
-		params.add(schedule.getMemo());
-		params.add(schedule.getStartDt());
-		params.add(schedule.getEndDt());
-		params.add(schedule.getScheduleId());
-
-		int result = executeSql(connection, sql, params);
-
-		closeConnection(connection);
+		int result = sqlSession.update("schedule.updateSchedule", schedule);
 
 		return result;
 	}
 
 	public int deleteSchedule(String scheduleId) {
-		Connection connection = getConnection();
-
-		String sql = "DELETE FROM SCHEDULE WHERE SCHEDULE_ID=?";
-
-		List params = new ArrayList();
-		params.add(scheduleId);
-
-		int result = executeSql(connection, sql, params);
-
-		closeConnection(connection);
+		int result = sqlSession.delete("schedule.deleteSchedule", scheduleId);
 
 		return result;
 	}
+
+	public List<ScheduleVO> selectSchedules(String startDt, String endDt) {
+		Map params = new HashMap();
+		params.put("startDt", startDt);
+		params.put("endDt", endDt);
+
+		List<ScheduleVO> result = sqlSession.selectList("schedule.selectSchedules", params);
+
+		return result;
+	}
+
+	public ScheduleVO selectSchedule(String scheduleId) {
+
+		ScheduleVO schedule = sqlSession.selectOne("schedule.selectSchedule", scheduleId);
+
+		return schedule;
+	}
+
+
 }

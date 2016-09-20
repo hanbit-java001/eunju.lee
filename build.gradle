@@ -59,3 +59,4 @@ uploadArchives {
 }
 
 project.webAppDirName = 'webapp'
+

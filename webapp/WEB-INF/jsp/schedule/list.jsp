@@ -4,139 +4,125 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
 <title>스케줄러</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/static/plugins/material/iconfont/material-icons.css">
+<link rel="stylesheet" href="/static/plugins/fullcalendar/fullcalendar.min.css" />
 <style type="text/css">
-#txtYearMonth {
-	font-size: 20px;
-	font-weight: bold;
-	margin-left: 10px;
-	margin-right: 10px;
-}
-
-#monthlySchedule {
+.hanbit-header {
+	position: fixed;
 	width: 100%;
+	height: 48px;
+	background-color: #3F51B5;
+	z-index: 1000;
 }
 
-#monthlySchedule th {
-	height: 25px;
+.hanbit-top-button {
+	position: relative;
+	width: 48px;
+	height: 48px;
+	color: white;
 	text-align: center;
+	cursor: pointer;
+}
+.hanbit-top-button.right {
+	display: inline-block;
+	right: 0px;
+}
+.hanbit-top-button.arrow {
+	width: 32px;
 }
 
-#monthlySchedule td {
-	height: 80px;
+#btnGroupRight {
+	position: absolute;
+	top: 0px;
+	right: 0px;
 }
 
-#navMonth {
-	text-align: center;
-	padding: 10px;
+.hanbit-abs-center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
 
-#controlButtons {
-	text-align: right;
-}
-
-#calendar {
-	padding: 10px;
+.hanbit-container {
+	padding: 58px 10px 10px 10px;
 }
 </style>
 </head>
 <body>
-	<div id="calendar">
-		<div id="navMonth">
-			<button id="btnPrevMonth" class="btn btn-primary"><i class="fa fa-chevron-left"></i> 지난달</button>
-			<span id="txtYearMonth"></span>
-			<button id="btnNextMonth" class="btn btn-primary">다음달 <i class="fa fa-chevron-right"></i></button>
+
+	<header class="hanbit-header">
+		<div id="btnMenu" class="hanbit-top-button">
+			<i class="material-icons hanbit-abs-center">menu</i>
 		</div>
-		<div>
-			<table id="monthlySchedule" class="table table-bordered">
-				<thead>
-					<tr>
-						<th class="sunday">일</th>
-						<th>월</th>
-						<th>화</th>
-						<th>수</th>
-						<th>목</th>
-						<th>금</th>
-						<th day="sat">토</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
+		<div id="btnGroupRight">
+			<div id="btnPrevMonth" class="hanbit-top-button right arrow">
+				<i class="material-icons hanbit-abs-center">keyboard_arrow_left</i>
+			</div>
+			<div id="btnNextMonth" class="hanbit-top-button right arrow">
+				<i class="material-icons hanbit-abs-center">keyboard_arrow_right</i>
+			</div>
+			<div id="btnAddSchedule" class="hanbit-top-button right">
+				<i class="material-icons hanbit-abs-center">add</i>
+			</div>
 		</div>
-		<div id="controlButtons">
-			<button class="btn btn-success">일정추가</button>
-		</div>
+	</header>
+
+	<div class="hanbit-container">
+		<div id="calendar"></div>
 	</div>
-<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script src="/static/plugins/jquery/jquery-3.1.0.min.js"></script>
+<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/plugins/momentjs/moment.min.js"></script>
+<script src="/static/plugins/fullcalendar/fullcalendar.min.js"></script>
+<script src="/static/plugins/fullcalendar/locale/ko.js"></script>
 <script type="text/javascript">
+$(document).ready(function() {
 
-var current = moment();
+    $('#calendar').fullCalendar({
+    	locale: "ko",
+    	height: "auto",
 
-function makeCalendar(year, month) {
-	var calendarTitle = $("#txtYearMonth");
-	calendarTitle.html(year + "년 " + month + "월");
+    	header: {
+    	    left:   "",
+    	    center: "title",
+    	    right:  ""
+    	},
 
-	var calendarBody = $("#monthlySchedule tbody");
+    	dayClick: function(date) {
+    		alert(date.format('MMMM Do YYYY, h:mm:ss a'));
+        }
+    });
 
-	var date = moment(year + "-" + month + "-01");
-	var firstDay = date.day();
+    $("#btnPrevMonth").on("click", function() {
+    	$('#calendar').fullCalendar("prev");
+    });
 
-	var day = 1;
-	var days = "";
-	var isFindFirstDay = false;
-	var isEndOfMonth = false;
+    $("#btnNextMonth").on("click", function() {
+    	$('#calendar').fullCalendar("next");
+    });
 
-	while (!isEndOfMonth) {
-		days += "<tr>";
+    jQuery.ajax({
+    	url: "/api/schedule/list?startDt=20160901&endDt=20160930"
+    }).done(function(data) {
+    	  for (var i=0;i<data.length;i++) {
+    		  var event = {};
 
-		for (var d=0;d<7;d++) {
-			var dateString = "";
+    		  event.title = data[i].title;
+    		  event.start = moment(data[i].startDt, "YYYYMMDDHHmm").format("YYYY-MM-DDTHH:mm");
+    		  event.end = moment(data[i].endDt, "YYYYMMDDHHmm").format("YYYY-MM-DDTHH:mm");
 
-			if (isEndOfMonth) {
-				dateString = "";
-			}
-			else if (!isFindFirstDay) {
-				if (firstDay == d) {
-					dateString = day;
-					isFindFirstDay = true;
-				}
-			}
-			else {
-				dateString = ++day;
-			}
+    		  $('#calendar').fullCalendar("renderEvent", event, true);
+    	  }
+    });
 
-			days += "<td>" + dateString + "</td>";
-
-			if (day == date.endOf("month").get("date")) {
-				isEndOfMonth = true;
-			}
-		}
-
-		days += "</tr>";
-	}
-
-	calendarBody.html(days);
-}
-
-makeCalendar(current.get("year"), current.get("month") + 1);
-
-$("#btnPrevMonth").on("click", function() {
-	var prev = current.subtract(1, "month");
-
-	makeCalendar(prev.get("year"), prev.get("month") + 1);
 });
-
-$("#btnNextMonth").on("click", function() {
-	var prev = current.add(1, "month");
-
-	makeCalendar(prev.get("year"), prev.get("month") + 1);
-});
-
 </script>
 </body>
 </html>

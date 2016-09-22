@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" href="/static/plugins/material/iconfont/material-icons.css">
 <link rel="stylesheet" href="/static/plugins/fullcalendar/fullcalendar.min.css" />
+<link rel="stylesheet" href="/static/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" />
 <style type="text/css">
 .hanbit-header {
 	position: fixed;
@@ -52,6 +53,37 @@
 .hanbit-container {
 	padding: 58px 10px 10px 10px;
 }
+
+#btnGroupAddSchedule {
+	display: none;
+}
+
+#divAddSchedule {
+	display: none;
+	position: relative;
+}
+
+#divAddSchedule .form-control[readonly] {
+	background-color: white;
+}
+
+.hanbit-schedule-detail {
+	width: 100%;
+}
+
+.hanbit-schedule-detail .column-title {
+	width: 20%;
+	min-width: 80px;
+	max-width: 150px;
+}
+
+.hanbit-schedule-detail .column-value {
+	width: 80%;
+}
+
+.bottom-buttons {
+	text-align: center;
+}
 </style>
 </head>
 <body>
@@ -61,31 +93,69 @@
 			<i class="material-icons hanbit-abs-center">menu</i>
 		</div>
 		<div id="btnGroupRight">
-			<div id="btnPrevMonth" class="hanbit-top-button right arrow">
-				<i class="material-icons hanbit-abs-center">keyboard_arrow_left</i>
+			<div id="btnGroupCalendar">
+				<div id="btnPrevMonth" class="hanbit-top-button right arrow">
+					<i class="material-icons hanbit-abs-center">keyboard_arrow_left</i>
+				</div>
+				<div id="btnToday" class="hanbit-top-button right">
+					<i class="material-icons hanbit-abs-center">today</i>
+				</div>
+				<div id="btnNextMonth" class="hanbit-top-button right arrow">
+					<i class="material-icons hanbit-abs-center">keyboard_arrow_right</i>
+				</div>
+				<div id="btnAddSchedule" class="hanbit-top-button right">
+					<i class="material-icons hanbit-abs-center">add</i>
+				</div>
 			</div>
-			<div id="btnNextMonth" class="hanbit-top-button right arrow">
-				<i class="material-icons hanbit-abs-center">keyboard_arrow_right</i>
-			</div>
-			<div id="btnAddSchedule" class="hanbit-top-button right">
-				<i class="material-icons hanbit-abs-center">add</i>
+
+			<div id="btnGroupAddSchedule">
+				<div class="btnApplyAddSchedule hanbit-top-button right">
+					<i class="material-icons hanbit-abs-center">done</i>
+				</div>
+				<div class="btnCancelAddSchedule hanbit-top-button right">
+					<i class="material-icons hanbit-abs-center">clear</i>
+				</div>
 			</div>
 		</div>
 	</header>
 
 	<div class="hanbit-container">
 		<div id="calendar"></div>
+
+		<div id="divAddSchedule">
+			<div class="form-group">
+    			<label for="txtTitle">제목</label>
+    			<input type="text" class="form-control" id="txtTitle" placeholder="제목">
+			</div>
+			<div class="form-group">
+    			<label for="txtStartDt">시작</label>
+    			<input type="text" class="form-control" id="txtStartDt" placeholder="시작">
+			</div>
+			<div class="form-group">
+    			<label for="txtEndDt">종료</label>
+    			<input type="text" class="form-control" id="txtEndDt" placeholder="종료">
+			</div>
+			<div class="form-group">
+    			<label for="txtMemo">메모</label>
+    			<textarea class="form-control" id="txtMemo" placeholder="메모" rows="3"></textarea>
+			</div>
+			<div class="bottom-buttons">
+				<button class="btnApplyAddSchedule btn btn-success">추가</button>
+				<button class="btnCancelAddSchedule btn btn-danger">취소</button>
+			</div>
+		</div>
 	</div>
 
 <script src="/static/plugins/jquery/jquery-3.1.0.min.js"></script>
 <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/plugins/momentjs/moment.min.js"></script>
 <script src="/static/plugins/fullcalendar/fullcalendar.min.js"></script>
+<script src="/static/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/static/plugins/fullcalendar/locale/ko.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 
-    $('#calendar').fullCalendar({
+    $("#calendar").fullCalendar({
     	locale: "ko",
     	height: "auto",
 
@@ -96,32 +166,206 @@ $(document).ready(function() {
     	},
 
     	dayClick: function(date) {
-    		alert(date.format('MMMM Do YYYY, h:mm:ss a'));
+    		showAddSchedule(date);
         }
     });
 
+    $("#txtStartDt").datetimepicker({
+    	locale: "ko",
+    	format: "YYYY-MM-DD a hh:mm",
+    	stepping: 15,
+    	ignoreReadonly: true,
+    	showClose: true
+    });
+
+    $("#txtEndDt").datetimepicker({
+    	locale: "ko",
+    	format: "YYYY-MM-DD a hh:mm",
+    	stepping: 15,
+    	ignoreReadonly: true,
+    	showClose: true
+    });
+
+	if (navigator.userAgent.indexOf("Mobile") > -1) {
+		$("#txtStartDt").attr("readonly", "readonly");
+		$("#txtEndDt").attr("readonly", "readonly");
+	}
+
+    var rangeFormat = "YYYYMMDDHHmm";
+    var currentMoment = moment();
+
+    var range = {
+       	start: currentMoment.startOf("month").format(rangeFormat),
+       	end: currentMoment.endOf("month").format(rangeFormat)
+    };
+
     $("#btnPrevMonth").on("click", function() {
-    	$('#calendar').fullCalendar("prev");
+    	showPrevMonth();
     });
 
     $("#btnNextMonth").on("click", function() {
-    	$('#calendar').fullCalendar("next");
+    	showNextMonth();
     });
 
-    jQuery.ajax({
-    	url: "/api/schedule/list?startDt=20160901&endDt=20160930"
-    }).done(function(data) {
-    	  for (var i=0;i<data.length;i++) {
-    		  var event = {};
-
-    		  event.title = data[i].title;
-    		  event.start = moment(data[i].startDt, "YYYYMMDDHHmm").format("YYYY-MM-DDTHH:mm");
-    		  event.end = moment(data[i].endDt, "YYYYMMDDHHmm").format("YYYY-MM-DDTHH:mm");
-
-    		  $('#calendar').fullCalendar("renderEvent", event, true);
-    	  }
+    $("#btnToday").on("click", function() {
+    	showThisMonth();
     });
 
+    function showAddSchedule(date) {
+		$("#btnGroupCalendar").hide();
+		$("#btnGroupAddSchedule").show();
+
+		$("#calendar").hide();
+		$("#divAddSchedule").show();
+
+		$("#txtTitle").val("");
+		$("#txtStartDt").data("DateTimePicker").date(date);
+		$("#txtEndDt").data("DateTimePicker").date(date.add(1, "hour"));
+		$("#txtMemo").val("");
+    }
+
+    function hideAddSchedule() {
+		$("#btnGroupAddSchedule").hide();
+		$("#btnGroupCalendar").show();
+
+		$("#divAddSchedule").hide();
+		$("#calendar").show();
+    }
+
+    function addSchedule() {
+		var title = $("#txtTitle").val();
+		var startDt = $("#txtStartDt").val();
+		var endDt = $("#txtEndDt").val();
+		var memo = $("#txtMemo").val();
+
+		if (title.trim() == "") {
+			alert("제목을 입력하세요.");
+			$("#txtTitle").val("");
+			$("#txtTitle").focus();
+			return;
+		}
+		else if (startDt.trim() == "") {
+			alert("시작일시를 입력하세요.");
+			$("#txtStartDt").val("");
+			$("#txtStartDt").focus();
+			return;
+		}
+		else if (endDt.trim() == "") {
+			alert("종료일시를 입력하세요.");
+			$("#txtEndDt").val("");
+			$("#txtEndDt").focus();
+			return;
+		}
+
+		startDt = $("#txtStartDt").data("DateTimePicker").date();
+		endDt = $("#txtEndDt").data("DateTimePicker").date();
+
+		if (startDt.isAfter(endDt)) {
+			alert("시작일시는 종료일시보다 이전 일시여야 합니다.");
+			return;
+		}
+
+    	var schedule = {
+			title: title,
+			startDt: startDt.format(rangeFormat),
+			endDt: endDt.format(rangeFormat),
+			memo: memo
+		};
+
+		$.ajax({
+			url: "/api/schedule/add",
+			method: "POST",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			data: JSON.stringify(schedule)
+		}).done(function(result) {
+			$("#btnGroupAddSchedule").hide();
+			$("#btnGroupCalendar").show();
+
+			$("#divAddSchedule").hide();
+			$("#calendar").show();
+
+			addScheduleToCalendar(result);
+		}).fail(function() {
+			alert("사용자가 폭주하여 잠시 후 사용해주세요.");
+		});
+    }
+
+    function addScheduleToCalendar(originEvent) {
+		  var event = {};
+
+		  event.title = originEvent.title;
+		  event.start = moment(originEvent.startDt, rangeFormat).format("YYYY-MM-DDTHH:mm");
+		  event.end = moment(originEvent.endDt, rangeFormat).format("YYYY-MM-DDTHH:mm");
+
+		  $("#calendar").fullCalendar("renderEvent", event);
+	}
+
+    $("#btnAddSchedule").on("click", function() {
+    	showAddSchedule(moment());
+    });
+
+    $(".btnApplyAddSchedule").on("click", function() {
+    	addSchedule();
+    });
+
+    $(".btnCancelAddSchedule").on("click", function() {
+    	hideAddSchedule();
+    });
+
+    function showThisMonth() {
+    	if (currentMoment.format("YYYYMM") == moment().format("YYYYMM")) {
+    		return;
+    	}
+
+    	$("#calendar").fullCalendar("today");
+
+    	currentMoment = moment();
+
+    	getMonthlySchedules();
+    }
+
+    function showPrevMonth() {
+    	$("#calendar").fullCalendar("prev");
+
+    	currentMoment = currentMoment.subtract(1, "month");
+
+    	getMonthlySchedules();
+    }
+
+    function showNextMonth() {
+    	$("#calendar").fullCalendar("next");
+
+    	currentMoment = currentMoment.add(1, "month");
+
+    	getMonthlySchedules();
+    }
+
+    function getMonthlySchedules() {
+    	range.start = currentMoment.startOf("month").format(rangeFormat);
+    	range.end = currentMoment.endOf("month").format(rangeFormat);
+
+    	getSchedules(range.start, range.end);
+    }
+
+    function getSchedules(startDt, endDt) {
+	    jQuery.ajax({
+	    	url: "/api/schedule/list",
+	    	method: "GET",
+	    	data: {
+	    		startDt: startDt,
+	    		endDt: endDt
+	    	}
+	    }).done(function(result) {
+	    	  for (var i=0;i<result.length;i++) {
+	    		  addScheduleToCalendar(result[i]);
+	    	  }
+	    }).fail(function() {
+			alert("사용자가 폭주하여 잠시 후 사용해주세요.");
+	    });
+    }
+
+    getSchedules(range.start, range.end);
 });
 </script>
 </body>

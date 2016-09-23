@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.hanbit.eunju.lee.core.dao.ScheduleDAO;
 import com.hanbit.eunju.lee.core.vo.ScheduleVO;
+import com.hanbit.eunju.lee.core.service.SchedulerService;
 
 @Service
 public class SchedulerService {
@@ -20,7 +21,7 @@ public class SchedulerService {
 	private ScheduleDAO scheduleDAO;
 
 	public int addSchedule(ScheduleVO schedule) {
-		LOGGER.debug("½ºÄÉÁÙ Ãß°¡");
+		LOGGER.debug("ìŠ¤ì¼€ì¤„ ì¶”ê°€");
 
 		return scheduleDAO.insertSchedule(schedule);
 	}
@@ -49,6 +50,10 @@ public class SchedulerService {
 		String uniqueId = time + threadId;
 
 		return uniqueId;
+	}
+
+	public int countSchedule(String startDt, String endDt) {
+		return scheduleDAO.countSchedule(startDt, endDt);
 	}
 
 }

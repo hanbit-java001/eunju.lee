@@ -1,6 +1,8 @@
 package com.hanbit.eunju.lee.web.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -57,7 +61,42 @@ public class ScheduleController {
 		return schedule;
 	}
 
+	@RequestMapping("/api/schedule/countSchedule")
+	@ResponseBody
+	public Map countSchedule(@RequestParam("startDt") String startDt,
+			@RequestParam("endDt") String endDt) {
+
+		int eventCount = schedulerService.countSchedule(startDt, endDt);
+
+		Map result = new HashMap();
+
+		result.put("eventCount", eventCount);
+
+		return result;
+	}
+
+	@RequestMapping(value="/api/schedule/{scheduleId}", method=RequestMethod.DELETE)
+	@ResponseBody
+	public Map removeSchedule(@PathVariable("scheduleId") String scheduleId) {
+
+		int countRemove = schedulerService.removeSchedule(scheduleId);
+
+		Map result = new HashMap();
+
+		result.put("countRemove", countRemove);
+
+		return result;
+	}
+
+	@RequestMapping(value="/api/schedule/{scheduleId}", method=RequestMethod.GET)
+	@ResponseBody
+	public ScheduleVO getSchedule(@PathVariable("scheduleId") String scheduleId) {
+
+		return schedulerService.getSchedule(scheduleId);
+	}
+
 }
+
 /*	@RequestMapping("/api/schedule/list")
 	@ResponseBody
 	public List<ScheduleVO> listSchedules(HttpServletRequest request) {

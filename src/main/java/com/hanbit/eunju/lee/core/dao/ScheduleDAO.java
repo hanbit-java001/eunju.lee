@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.hanbit.eunju.lee.core.vo.ScheduleVO;
+import com.hanbit.eunju.lee.core.dao.ScheduleDAO;
 
 @Repository
 public class ScheduleDAO {
@@ -25,7 +26,7 @@ public class ScheduleDAO {
 	private SqlSession sqlSession;
 
 	public int insertSchedule(ScheduleVO schedule) {
-		LOGGER.debug("¿Œº≠∆Æ Ω∫ƒ…¡Ÿ");
+		LOGGER.debug("Ïù∏ÏÑúÌä∏ Ïä§ÏºÄÏ§Ñ");
 
 		int result = sqlSession.insert("schedule.insertSchedule", schedule);
 
@@ -55,11 +56,19 @@ public class ScheduleDAO {
 	}
 
 	public ScheduleVO selectSchedule(String scheduleId) {
-
 		ScheduleVO schedule = sqlSession.selectOne("schedule.selectSchedule", scheduleId);
 
 		return schedule;
 	}
 
+	public int countSchedule(String startDt, String endDt) {
+		Map params = new HashMap();
+		params.put("startDt", startDt);
+		params.put("endDt", endDt);
+
+		int result = sqlSession.selectOne("schedule.countSchedule", params);
+
+		return result;
+	}
 
 }

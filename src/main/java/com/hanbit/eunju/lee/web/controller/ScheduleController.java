@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.hanbit.eunju.lee.core.service.SchedulerService;
 import com.hanbit.eunju.lee.core.vo.ScheduleVO;
-import com.hanbit.eunju.lee.web.controller.ScheduleController;
 
 @Controller
 public class ScheduleController {
@@ -95,17 +92,17 @@ public class ScheduleController {
 		return schedulerService.getSchedule(scheduleId);
 	}
 
-}
-
-/*	@RequestMapping("/api/schedule/list")
+	@RequestMapping("/api/schedule/modify")
 	@ResponseBody
-	public List<ScheduleVO> listSchedules(HttpServletRequest request) {
-		String startDt = request.getParameter("startDt");
-		String endDt = request.getParameter("endDt");
+	public ScheduleVO modifySchedule(@RequestBody ScheduleVO schedule) {
 
-		List<ScheduleVO> result = schedulerService.listSchedules(startDt, endDt);
+		int countModified = schedulerService.modifySchedule(schedule);
 
-		return result;
+		if (countModified == 0) {
+			throw new RuntimeException();
+		}
+
+		return schedule;
 	}
-*/
 
+}

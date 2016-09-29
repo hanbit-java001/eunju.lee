@@ -17,7 +17,7 @@ public class SimpleApplication {
 
 		int result = schedulerService.addSchedule(schedule);
 
-		System.out.println("°á°ú: " + result);
+		System.out.println("ê²°ê³¼: " + result);
 	}
 
 }

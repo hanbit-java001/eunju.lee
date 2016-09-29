@@ -1,15 +1,13 @@
 package com.hanbit.eunju.lee.standalone;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 public class Location {
 	public static final String HOSPITAL = "ë³‘ì›";
-	public static final String HOME = "ì§?";
-	public static final String SCHOOL = "?•™êµ?";
+	public static final String HOME = "ì§‘";
+	public static final String SCHOOL = "í•™êµ";
 
-	public static Location LOC_HOME = new Location(HOME, "?„œ?š¸ ê°•ì„œêµ?");
-	public static Location LOC_HOSPITAL = new Location(HOSPITAL, "?„œ?š¸ ë§ˆí¬êµ?");
-	public static Location LOC_SCHOOL = new School("?„œ?š¸ ???‰êµ?");
+	public static Location LOC_HOME = new Location(HOME, "ì„œìš¸ ê°•ì„œêµ¬");
+	public static Location LOC_HOSPITAL = new Location(HOSPITAL, "ì„œìš¸ ë§ˆí¬êµ¬");
+	public static Location LOC_SCHOOL = new School("ì„œìš¸ ì€í‰êµ¬");
 
 	private String name;
 	private String address;
@@ -23,7 +21,7 @@ public class Location {
 		this.name = name;
 		this.address = address;
 
-		Location school = new School("?„œ?š¸");
+		Location school = new School("ì„œìš¸");
 
 		if (school instanceof School) {
 			School middleSchool = (School) school;

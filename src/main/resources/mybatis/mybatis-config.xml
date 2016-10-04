@@ -10,6 +10,7 @@
 	<typeAliases>
 		<typeAlias type="com.hanbit.eunju.lee.core.vo.ScheduleVO" alias="ScheduleVO"/>
 		<typeAlias type="com.hanbit.eunju.lee.core.vo.MemberVO" alias="MemberVO"/>
+		<typeAlias type="com.hanbit.eunju.lee.core.vo.MemberVO" alias="FileVO"/>
 	</typeAliases>
 
 </configuration>

@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class WelcomeController {
 
 	@RequestMapping("/")
-	public String welcome(Model model) {
+	public String welcome() {
 
-		model.addAttribute("name", "Hanbit");
 		return "welcome";
 	}
 
@@ -22,9 +21,11 @@ public class WelcomeController {
 	@ResponseBody
 	public Map getData() {
 		Map map = new HashMap();
+
 		map.put("name", "Hanbit");
 		map.put("message", "Hello");
 
 		return map;
 	}
+
 }

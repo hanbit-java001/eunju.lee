@@ -28,10 +28,6 @@
 	right: 0px;
 }
 
-#btnGroupSub {
-	display: none;
-}
-
 .hanbit-abs-center {
 	position: absolute;
 	top: 50%;
@@ -56,6 +52,10 @@
 	position: relative;
 }
 
+#btnGroupSub {
+	display: none;
+}
+
 .input-required {
-	color: #F00;
+	color: #f00;
 }

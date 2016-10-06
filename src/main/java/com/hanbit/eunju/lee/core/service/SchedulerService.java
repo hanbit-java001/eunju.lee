@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hanbit.eunju.lee.core.dao.ScheduleDAO;
+import com.hanbit.eunju.lee.core.session.SessionHelpler;
 import com.hanbit.eunju.lee.core.vo.ScheduleVO;
-import com.hanbit.eunju.lee.core.service.SchedulerService;
 
 @Service
 public class SchedulerService {

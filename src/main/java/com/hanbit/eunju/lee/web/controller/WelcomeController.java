@@ -8,8 +8,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.hanbit.eunju.lee.core.session.LoginRequired;
+
 @Controller
 public class WelcomeController {
+
 
 	@RequestMapping("/")
 	public String welcome() {
@@ -17,6 +20,7 @@ public class WelcomeController {
 		return "welcome";
 	}
 
+	@LoginRequired
 	@RequestMapping("/api/data")
 	@ResponseBody
 	public Map getData() {

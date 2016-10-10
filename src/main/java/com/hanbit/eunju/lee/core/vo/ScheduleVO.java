@@ -1,11 +1,13 @@
 package com.hanbit.eunju.lee.core.vo;
 
 public class ScheduleVO {
+
 	private String scheduleId;
 	private String title;
 	private String memo;
 	private String startDt;
 	private String endDt;
+	private int memberId;
 
 	public String getScheduleId() {
 		return scheduleId;
@@ -37,4 +39,11 @@ public class ScheduleVO {
 	public void setEndDt(String endDt) {
 		this.endDt = endDt;
 	}
+	public int getMemberId() {
+		return memberId;
+	}
+	public void setMemberId(int memberId) {
+		this.memberId = memberId;
+	}
+
 }

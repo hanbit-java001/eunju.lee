@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hanbit.eunju.lee.core.dao.MemberDAO;
 import com.hanbit.eunju.lee.core.vo.MemberVO;
@@ -23,8 +24,8 @@ public class MemberService {
 	@Autowired
 	private SecurityService securityService;
 
-	public String joinMember (MemberVO member) {
-
+	@Transactional
+	public String joinMember(MemberVO member) {
 		int countMember = memberDAO.countMember(member.getEmail());
 
 		if (countMember > 0) {
@@ -36,18 +37,19 @@ public class MemberService {
 
 		String encryptedPassword = securityService.encryptPassword(member.getPassword());
 		member.setPassword(encryptedPassword);
+
 		memberDAO.insertMember(member);
 
 		return member.getName();
 	}
 
+	@Transactional
 	public boolean modifyMember(MemberVO member) {
-
 		String passwordFromDB = memberDAO.selectPassword(member.getMemberId());
 		String passwordCurrent = member.getCurrentPassword();
 		String encryptedPasswordCurrent = securityService.encryptPassword(passwordCurrent);
 
-		if(!passwordFromDB.equals(encryptedPasswordCurrent)) {
+		if (!securityService.matchPassword(passwordFromDB, encryptedPasswordCurrent)) {
 			throw new RuntimeException("현재 패스워드를 잘못 입력하셨습니다.");
 		}
 
@@ -62,4 +64,5 @@ public class MemberService {
 	public MemberVO getMember(int memberId) {
 		return memberDAO.selectMember(memberId);
 	}
+
 }
